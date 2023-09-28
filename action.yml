@@ -19,6 +19,7 @@ runs:
         echo "MANIFEST_JSON<<EOF" >> $GITHUB_ENV
         cat ./manifest.json >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
+      shell: bash
 
     - name: Load vendor, name and version
       run: |
@@ -30,6 +31,7 @@ runs:
         echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
         APP_FULL_NAME=$APP_VENDOR.$APP_NAME@$APP_VERSION
         echo "APP_FULL_NAME=$APP_FULL_NAME" >> $GITHUB_ENV
+      shell: bash
 
     - name: Authenticate
       uses: vtex/action-toolbelt@v8
@@ -47,6 +49,7 @@ runs:
           echo -e "\nFailed to publish app."
           exit 1
         fi
+      shell: bash
 
     - name: Deploy App
       run: |
@@ -57,3 +60,4 @@ runs:
           echo -e "\nFailed to deploy app."
           exit 1
         fi
+      shell: bash
