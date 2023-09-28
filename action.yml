@@ -14,15 +14,16 @@ runs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Load manifest.json
-      run: |
+    - run: |
+        echo "::group::Load manifest.json"
         echo "MANIFEST_JSON<<EOF" >> $GITHUB_ENV
         cat ./manifest.json >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
+        echo "::endgroup::"
       shell: bash
 
-    - name: Load vendor, name and version
-      run: |
+    - run: |
+        echo "::group::Load vendor, name and version"
         APP_VENDOR=${{ fromJson(env.MANIFEST_JSON).vendor }}
         echo "APP_VENDOR=$APP_VENDOR" >> $GITHUB_ENV
         APP_NAME=${{ fromJson(env.MANIFEST_JSON).name }}
@@ -31,6 +32,7 @@ runs:
         echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
         APP_FULL_NAME=$APP_VENDOR.$APP_NAME@$APP_VERSION
         echo "APP_FULL_NAME=$APP_FULL_NAME" >> $GITHUB_ENV
+        echo "::endgroup::"
       shell: bash
 
     - name: Authenticate
@@ -40,24 +42,24 @@ runs:
         appKey: ${{ inputs.appKey }}
         appToken: ${{ inputs.appToken }}
 
-    - name: Publish App
-      run: |
-        echo -e "\n=============== Publish app ${{ env.APP_FULL_NAME }}\n"
+    - run: |
+        echo "::group::Publish app ${{ env.APP_FULL_NAME }}"
         output=$(vtex publish)
         echo "$output"
         if [[ $output != *"published successfully"* ]]; then
           echo -e "\nFailed to publish app."
           exit 1
         fi
+        echo "::endgroup::"
       shell: bash
 
-    - name: Deploy App
-      run: |
-        echo -e "\n=============== Deploy app ${{ env.APP_FULL_NAME }}\n"
+    - run: |
+        echo "::group::Deploy app ${{ env.APP_FULL_NAME }}"
         output=$(vtex deploy --force)
         echo "$output"
         if [[ $output != *"Successfully deployed"* ]]; then
           echo -e "\nFailed to deploy app."
           exit 1
         fi
+        echo "::endgroup::"
       shell: bash
