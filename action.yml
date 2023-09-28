@@ -11,19 +11,21 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - run: echo "::group::Checkout repository ${{ github.repository }}"
     - name: Checkout
       uses: actions/checkout@v4
+    - run: echo "::endgroup::"
 
+    - run: echo "::group::Load manifest.json"
     - run: |
-        echo "::group::Load manifest.json"
         echo "MANIFEST_JSON<<EOF" >> $GITHUB_ENV
         cat ./manifest.json >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
-        echo "::endgroup::"
       shell: bash
+    - run: echo "::endgroup::"
 
+    - run: echo "::group::Load vendor, name and version"
     - run: |
-        echo "::group::Load vendor, name and version"
         APP_VENDOR=${{ fromJson(env.MANIFEST_JSON).vendor }}
         echo "APP_VENDOR=$APP_VENDOR" >> $GITHUB_ENV
         APP_NAME=${{ fromJson(env.MANIFEST_JSON).name }}
@@ -32,34 +34,35 @@ runs:
         echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
         APP_FULL_NAME=$APP_VENDOR.$APP_NAME@$APP_VERSION
         echo "APP_FULL_NAME=$APP_FULL_NAME" >> $GITHUB_ENV
-        echo "::endgroup::"
       shell: bash
+    - run: echo "::endgroup::"
 
-    - name: Authenticate
-      uses: vtex/action-toolbelt@v8
+    - run: echo "::group::Authenticate with Vtex Toolbet"
+    - uses: vtex/action-toolbelt@v8
       with:
         account: ${{ env.APP_VENDOR }}
         appKey: ${{ inputs.appKey }}
         appToken: ${{ inputs.appToken }}
+    - run: echo "::endgroup::"
 
+    - run: echo "::group::Publish app ${{ env.APP_FULL_NAME }}"
     - run: |
-        echo "::group::Publish app ${{ env.APP_FULL_NAME }}"
         output=$(vtex publish)
         echo "$output"
         if [[ $output != *"published successfully"* ]]; then
           echo -e "\nFailed to publish app."
           exit 1
         fi
-        echo "::endgroup::"
       shell: bash
+    - run: echo "::endgroup::"
 
+    - run: echo "::group::Deploy app ${{ env.APP_FULL_NAME }}"
     - run: |
-        echo "::group::Deploy app ${{ env.APP_FULL_NAME }}"
         output=$(vtex deploy --force)
         echo "$output"
         if [[ $output != *"Successfully deployed"* ]]; then
           echo -e "\nFailed to deploy app."
           exit 1
         fi
-        echo "::endgroup::"
       shell: bash
+    - run: echo "::endgroup::"
