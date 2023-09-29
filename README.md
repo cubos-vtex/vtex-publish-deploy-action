@@ -30,3 +30,5 @@ jobs:
           appKey: ${{ secrets.VTEX_TOOLBELT_KEY }}
           appToken: ${{ secrets.VTEX_TOOLBELT_TOKEN }}
 ```
+
+Then, after each `vtex release patch|minor|major stable` command, where a tag with `v[0-9]+.[0-9]+.[0-9]+` pattern is created in the repository, the action will be executed.
