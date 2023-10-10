@@ -2,7 +2,7 @@
 An action than publishes and deploys a VTEX IO app after release
 
 ## Requirements
-First, you need to create an [application key](https://help.vtex.com/pt/tutorial/chaves-de-aplicacao--2iffYzlvvz4BDMr6WGUtet) for your account.
+First, you need to create an [application key](https://help.vtex.com/pt/tutorial/chaves-de-aplicacao--2iffYzlvvz4BDMr6WGUtet) with publish, install and deploy app permissions for your account.
 
 Then, create the following secrets in your [Github repository secrets](https://docs.github.com/pt/actions/security-guides/using-secrets-in-github-actions) with respectively values of created application key and token:
 - `VTEX_TOOLBELT_KEY`
