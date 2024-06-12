@@ -43,7 +43,7 @@ runs:
 
     - run: |
         echo "::group::Publish app ${{ env.APP_FULL_NAME }}"
-        output=$(vtex publish)
+        output=$(vtex publish --force)
         echo "$output"
         if [[ $output != *"published successfully"* ]]; then
           echo -e "\nFailed to publish app."
