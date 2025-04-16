@@ -62,3 +62,16 @@ runs:
         fi
         echo "::endgroup::"
       shell: bash
+
+    - name: Create Release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        tag: ${{ github.ref_name }}
+      run: |
+        echo "::group::Create release $tag"
+        gh release create "$tag" \
+            --repo="$GITHUB_REPOSITORY" \
+            --title="$tag" \
+            --generate-notes
+        echo "::endgroup::"
+      shell: bash
