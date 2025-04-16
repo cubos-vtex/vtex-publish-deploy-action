@@ -22,10 +22,12 @@ on:
 
 jobs:
   publish_and_deploy:
+    permissions:
+      contents: write
     name: Publish and Deploy App
     runs-on: ubuntu-latest
     steps:
-      - uses: tiago-freire/vtex-publish-deploy-action@v1
+      - uses: tiago-freire/vtex-publish-deploy-action@v3
         with:
           appKey: ${{ secrets.VTEX_TOOLBELT_KEY }}
           appToken: ${{ secrets.VTEX_TOOLBELT_TOKEN }}
