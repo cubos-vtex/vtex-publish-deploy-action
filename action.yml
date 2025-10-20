@@ -35,7 +35,7 @@ runs:
         echo "::endgroup::"
       shell: bash
 
-    - uses: vtex/action-toolbelt@v8
+    - uses: vtex/action-toolbelt@v9
       with:
         account: ${{ env.APP_VENDOR }}
         appKey: ${{ inputs.appKey }}
