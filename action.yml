@@ -40,6 +40,7 @@ runs:
         account: ${{ env.APP_VENDOR }}
         appKey: ${{ inputs.appKey }}
         appToken: ${{ inputs.appToken }}
+        version: 4.2.2
 
     - run: |
         echo "::group::Publish app ${{ env.APP_FULL_NAME }}"
