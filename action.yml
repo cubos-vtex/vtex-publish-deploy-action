@@ -11,10 +11,6 @@ inputs:
   appToken:
     description: "App token to login with VTEX Toolbelt"
     required: true
-  toolbelt-version:
-    description: "Version of VTEX Toolbelt to be installed"
-    required: false
-    default: 3.0.0-beta-ci.3
   toolbelt-workspace:
     description: "Workspace to start after login, default master"
     required: false
@@ -46,19 +42,10 @@ runs:
         echo "::endgroup::"
       shell: bash
 
-    - name: "Create a dummy yarn.lock to simplify cache"
-      run: echo ${{ inputs.toolbelt-version }} >> yarn.lock
-      shell: bash
-
-    - name: "Set up Node.js"
-      uses: actions/setup-node@v4
-      with:
-        cache: yarn
-
     - name: "Install VTEX Toolbelt"
       run: |
         echo "::group::Global installation"
-        yarn global add vtex@${{ inputs.toolbelt-version }}
+        curl -L https://vtex.io/vtexcli/install | sh
         echo "::endgroup::"
         echo "::group::Check version"
         vtex version
