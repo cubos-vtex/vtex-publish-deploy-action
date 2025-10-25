@@ -1,6 +1,9 @@
 name: Publish and Deploy App
 author: Tiago Freire <freire.tiago@gmail.com>
 description: An action than publishes and deploys a VTEX IO app after release
+branding:
+  icon: 'box'
+  color: 'purple' 
 inputs:
   appKey:
     description: "App key to login with VTEX Toolbelt"
