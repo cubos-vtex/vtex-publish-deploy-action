@@ -27,7 +27,7 @@ jobs:
     name: Publish and Deploy App
     runs-on: ubuntu-latest
     steps:
-      - uses: cubos-vtex/vtex-publish-deploy-action@v7
+      - uses: cubos-vtex/vtex-publish-deploy-action@v8
         with:
           appKey: ${{ secrets.VTEX_TOOLBELT_KEY }}
           appToken: ${{ secrets.VTEX_TOOLBELT_TOKEN }}
