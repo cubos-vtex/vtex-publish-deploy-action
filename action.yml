@@ -64,7 +64,7 @@ runs:
 
     - run: |
         echo "::group::Publish app ${{ env.APP_FULL_NAME }}"
-        output=$(yes | vtex publish --force)
+        output=$(yes 2>/dev/null | vtex publish --force)
         echo "$output"
         if [[ $output != *"published successfully"* ]]; then
           echo -e "\nFailed to publish app."
@@ -75,7 +75,7 @@ runs:
 
     - run: |
         echo "::group::Deploy app ${{ env.APP_FULL_NAME }}"
-        output=$(yes | vtex deploy --force)
+        output=$(yes 2>/dev/null | vtex deploy --yes --force)
         echo "$output"
         if [[ $output != *"Successfully deployed"* ]]; then
           echo -e "\nFailed to deploy app."
