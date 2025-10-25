@@ -27,7 +27,7 @@ jobs:
     name: Publish and Deploy App
     runs-on: ubuntu-latest
     steps:
-      - uses: tiago-freire/vtex-publish-deploy-action@v5
+      - uses: tiago-freire/vtex-publish-deploy-action@v6
         with:
           appKey: ${{ secrets.VTEX_TOOLBELT_KEY }}
           appToken: ${{ secrets.VTEX_TOOLBELT_TOKEN }}
