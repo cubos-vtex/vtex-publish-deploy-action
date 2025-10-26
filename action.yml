@@ -1,9 +1,10 @@
 name: Publish and Deploy App
 author: Tiago Freire <freire.tiago@gmail.com>
-description: An action than publishes and deploys a VTEX IO app after release
+description: An action that publishes and deploys a VTEX IO app after release
 branding:
   icon: 'box'
-  color: 'purple' 
+  color: 'purple'
+
 inputs:
   appKey:
     description: "App key to login with VTEX Toolbelt"
@@ -15,6 +16,7 @@ inputs:
     description: "Workspace to start after login, default master"
     required: false
     default: master
+
 runs:
   using: "composite"
   steps:
@@ -42,7 +44,7 @@ runs:
         echo "::endgroup::"
       shell: bash
 
-    - name: "Install VTEX Toolbelt"
+    - name: Install VTEX Toolbelt
       run: |
         echo "::group::Global installation"
         curl -L https://vtex.io/vtexcli/install | sh
@@ -52,7 +54,7 @@ runs:
         echo "::endgroup::"
       shell: bash
 
-    - name: "Authentication"
+    - name: Authentication
       run: bash ${{ github.action_path }}/scripts/toolbelt-entrypoint.sh
       env:
         VTEX_AUTHENTICATE: "true"
@@ -62,25 +64,27 @@ runs:
         VTEX_WORKSPACE: ${{ inputs.toolbelt-workspace }}
       shell: bash
 
-    - run: |
+    - name: Publish App
+      run: |
         echo "::group::Publish app ${{ env.APP_FULL_NAME }}"
-        output=$(yes || true 2>/dev/null | vtex publish --force)
-        echo "$output"
-        if [[ $output != *"published successfully"* ]]; then
-          echo -e "\nFailed to publish app."
+        yes | vtex publish --force 2>&1 | tee publish.log || true
+        if ! grep -q "published successfully" publish.log; then
+          echo -e "\n❌ Failed to publish app ${{ env.APP_FULL_NAME }}."
           exit 1
         fi
+        echo "✅ App published successfully."
         echo "::endgroup::"
       shell: bash
 
-    - run: |
+    - name: Deploy App
+      run: |
         echo "::group::Deploy app ${{ env.APP_FULL_NAME }}"
-        output=$(yes || true 2>/dev/null | vtex deploy --yes --force)
-        echo "$output"
-        if [[ $output != *"Successfully deployed"* ]]; then
-          echo -e "\nFailed to deploy app."
+        yes | vtex deploy --yes --force 2>&1 | tee deploy.log || true
+        if ! grep -q "Successfully deployed" deploy.log; then
+          echo -e "\n❌ Failed to deploy app ${{ env.APP_FULL_NAME }}."
           exit 1
         fi
+        echo "✅ App deployed successfully."
         echo "::endgroup::"
       shell: bash
 
@@ -91,8 +95,8 @@ runs:
       run: |
         echo "::group::Create release $tag"
         gh release create "$tag" \
-            --repo="$GITHUB_REPOSITORY" \
-            --title="$tag" \
-            --generate-notes
+          --repo="$GITHUB_REPOSITORY" \
+          --title="$tag" \
+          --generate-notes
         echo "::endgroup::"
       shell: bash
