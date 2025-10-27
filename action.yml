@@ -20,19 +20,18 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Checkout
+    - name: Checkout app source
       uses: actions/checkout@v4
 
-    - run: |
-        echo "::group::Load manifest.json"
+    - name: Load manifest.json
+      run: |
         echo "MANIFEST_JSON<<EOF" >> $GITHUB_ENV
         cat ./manifest.json >> $GITHUB_ENV
         echo "EOF" >> $GITHUB_ENV
-        echo "::endgroup::"
       shell: bash
 
-    - run: |
-        echo "::group::Load vendor, name and version"
+    - name: Load app metadata
+      run: |
         APP_VENDOR=${{ fromJson(env.MANIFEST_JSON).vendor }}
         echo "APP_VENDOR=$APP_VENDOR" >> $GITHUB_ENV
         APP_NAME=${{ fromJson(env.MANIFEST_JSON).name }}
@@ -41,20 +40,18 @@ runs:
         echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
         APP_FULL_NAME=$APP_VENDOR.$APP_NAME@$APP_VERSION
         echo "APP_FULL_NAME=$APP_FULL_NAME" >> $GITHUB_ENV
-        echo "::endgroup::"
+        echo -e "✅ App ${{ env.APP_FULL_NAME }} found."
       shell: bash
 
     - name: Install VTEX Toolbelt
-      run: |
-        echo "::group::Global installation"
-        curl -L https://vtex.io/vtexcli/install | sh
-        echo "::endgroup::"
-        echo "::group::Check version"
-        vtex version
-        echo "::endgroup::"
+      run:  curl -L https://vtex.io/vtexcli/install | sh
       shell: bash
 
-    - name: Authentication
+    - name: Check VTEX Toolbelt version
+      run: vtex version
+      shell: bash
+
+    - name: VTEX Toolbelt authentication
       run: bash ${{ github.action_path }}/scripts/toolbelt-entrypoint.sh
       env:
         VTEX_AUTHENTICATE: "true"
@@ -64,39 +61,33 @@ runs:
         VTEX_WORKSPACE: ${{ inputs.toolbelt-workspace }}
       shell: bash
 
-    - name: Publish App
+    - name: Publish app ${{ env.APP_FULL_NAME }}
       run: |
-        echo "::group::Publish app ${{ env.APP_FULL_NAME }}"
         yes | vtex publish --force 2>&1 | tee publish.log || true
         if ! grep -q "published successfully" publish.log; then
           echo -e "\n❌ Failed to publish app ${{ env.APP_FULL_NAME }}."
           exit 1
         fi
         echo "✅ App published successfully."
-        echo "::endgroup::"
       shell: bash
 
-    - name: Deploy App
+    - name: Deploy app ${{ env.APP_FULL_NAME }}
       run: |
-        echo "::group::Deploy app ${{ env.APP_FULL_NAME }}"
         yes | vtex deploy --yes --force 2>&1 | tee deploy.log || true
         if ! grep -q "Successfully deployed" deploy.log; then
           echo -e "\n❌ Failed to deploy app ${{ env.APP_FULL_NAME }}."
           exit 1
         fi
         echo "✅ App deployed successfully."
-        echo "::endgroup::"
       shell: bash
 
-    - name: Create Release
+    - name: Create GitHub release ${{ github.ref_name }}
       env:
         GITHUB_TOKEN: ${{ github.token }}
         tag: ${{ github.ref_name }}
       run: |
-        echo "::group::Create release $tag"
         gh release create "$tag" \
           --repo="$GITHUB_REPOSITORY" \
           --title="$tag" \
           --generate-notes
-        echo "::endgroup::"
       shell: bash
