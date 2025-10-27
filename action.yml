@@ -1,4 +1,4 @@
-name: Publish and Deploy App
+name: Publish and Deploy VTEX IO App
 author: Tiago Freire <freire.tiago@gmail.com>
 description: An action that publishes and deploys a VTEX IO app after release
 branding:
@@ -12,7 +12,7 @@ inputs:
   appToken:
     description: "App token to login with VTEX Toolbelt"
     required: true
-  toolbelt-workspace:
+  workspace:
     description: "Workspace to start after login, default master"
     required: false
     default: master
@@ -23,8 +23,8 @@ runs:
     - name: Checkout app source
       uses: actions/checkout@v4
 
-    - run: |
-        echo "Run step: Load manifest.json"
+    - name: Load manifest.json
+      run: |
         echo "::group::Load manifest.json"
         echo "MANIFEST_JSON<<EOF" >> $GITHUB_ENV
         cat ./manifest.json >> $GITHUB_ENV
@@ -32,8 +32,8 @@ runs:
         echo "::endgroup::"
       shell: bash
 
-    - run: |
-        echo "Run step: Load app metadata"
+    - name: Load app metadata
+      run: |
         echo "::group::Load app metadata"
         APP_VENDOR=${{ fromJson(env.MANIFEST_JSON).vendor }}
         echo "APP_VENDOR=$APP_VENDOR" >> $GITHUB_ENV
@@ -47,8 +47,8 @@ runs:
         echo "::endgroup::"
       shell: bash
 
-    - run: |
-        echo "Run step: Install VTEX Toolbelt"
+    - name: Install VTEX Toolbelt
+      run: |
         echo "::group::Install VTEX Toolbelt"
         curl -L https://vtex.io/vtexcli/install | sh
         echo "::endgroup::"
@@ -64,11 +64,11 @@ runs:
         VTEX_ACCOUNT: ${{ env.APP_VENDOR }}
         VTEX_APP_KEY: ${{ inputs.appKey }}
         VTEX_APP_TOKEN: ${{ inputs.appToken }}
-        VTEX_WORKSPACE: ${{ inputs.toolbelt-workspace }}
+        VTEX_WORKSPACE: ${{ inputs.workspace }}
       shell: bash
 
-    - run: |
-        echo "Run step: Publish app"
+    - name: Publish app
+      run: |
         echo "::group::Publish app ${{ env.APP_FULL_NAME }}"
         yes | vtex publish --force 2>&1 | tee publish.log || true
         if ! grep -q "published successfully" publish.log; then
@@ -79,8 +79,8 @@ runs:
         echo "::endgroup::"
       shell: bash
 
-    - run: |
-        echo "Run step: Deploy app"
+    - name: Deploy app
+      run: |
         echo "::group::Deploy app ${{ env.APP_FULL_NAME }}"
         yes | vtex deploy --yes --force 2>&1 | tee deploy.log || true
         if ! grep -q "Successfully deployed" deploy.log; then
@@ -91,8 +91,8 @@ runs:
         echo "::endgroup::"
       shell: bash
 
-    - run: |
-        echo "Run step: Create release"
+    - name: Create release
+      run: |
         echo "::group::Create release $tag"
         gh release create "$tag" \
           --repo="$GITHUB_REPOSITORY" \
