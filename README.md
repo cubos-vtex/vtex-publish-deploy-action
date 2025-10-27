@@ -1,5 +1,5 @@
 # vtex-publish-deploy-action
-An action than publishes and deploys a VTEX IO app after release
+An action that publishes and deploys a VTEX IO app after release
 
 ## Requirements
 First, you need to create an [application key](https://help.vtex.com/pt/tutorial/chaves-de-aplicacao--2iffYzlvvz4BDMr6WGUtet) with publish, install and deploy app permissions for your account.
